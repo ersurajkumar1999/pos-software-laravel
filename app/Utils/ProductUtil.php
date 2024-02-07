@@ -626,7 +626,8 @@ class ProductUtil extends Util
 
         //Sub Total
         foreach ($products as $product) {
-            $unit_price_inc_tax = $uf_number ? $this->num_uf($product['unit_price_inc_tax']) : $product['unit_price_inc_tax'];
+            // $unit_price_inc_tax = $uf_number ? $this->num_uf($product['unit_price_inc_tax']) : $product['unit_price_inc_tax'];
+            $unit_price_inc_tax = $uf_number ? $this->num_uf($product['unit_price']) : $product['unit_price'];
             $quantity = $uf_number ? $this->num_uf($product['quantity']) : $product['quantity'];
 
             $output['total_before_tax'] += $quantity * $unit_price_inc_tax;
@@ -653,15 +654,46 @@ class ProductUtil extends Util
             }
         }
 
-        //Tax
+        // updated tax
+        // Sub Total
         $output['tax'] = 0;
-        if (!empty($tax_id)) {
-            $tax_details = TaxRate::find($tax_id);
-            if (!empty($tax_details)) {
+        $tax_amount = 0;
+        foreach ($products as $product) {
+            $unit_price = $uf_number ? $this->num_uf($product['unit_price']) : $product['unit_price'];
+            // dd($unit_price);
+            $product_tax = $product['tax_id'];
+            $product_quantity = $product['quantity'];
+            $d_amount = 0;
+            if (is_array($discount)) {
+                $discount_amount = $uf_number ? $this->num_uf($discount['discount_amount']) : $discount['discount_amount'];
+                if ($discount['discount_type'] == 'fixed') {
+                    $d_amount = $discount_amount;
+                } else {
+                    $d_amount = ($discount_amount/100) * $unit_price;
+                }
+            }
+            if (!empty($tax_id)) {
                 $output['tax_id'] = $tax_id;
-                $output['tax'] = ($tax_details->amount/100) * ($output['total_before_tax'] - $output['discount']);
+                $tax_details = TaxRate::find($tax_id);
+                $discounted_amount = $unit_price - $d_amount;
+                if (!empty($tax_details)) {
+                    if($product_tax){
+                        $tax_amount += ($tax_details->amount/100) * ($discounted_amount)*$product_quantity;
+                    }
+                }
             }
         }
+        $output['tax'] = $tax_amount;
+
+        // //Tax
+        // $output['tax'] = 0;
+        // if (!empty($tax_id)) {
+        //     $tax_details = TaxRate::find($tax_id);
+        //     if (!empty($tax_details)) {
+        //         $output['tax_id'] = $tax_id;
+        //         $output['tax'] = ($tax_details->amount/100) * ($output['total_before_tax'] - $output['discount']);
+        //     }
+        // }
         
         //Calculate total
         $output['final_total'] = $output['total_before_tax'] + $output['tax'] - $output['discount'];

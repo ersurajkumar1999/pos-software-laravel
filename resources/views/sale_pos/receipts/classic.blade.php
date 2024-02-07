@@ -115,7 +115,7 @@
 				<!-- customer info -->
 				@if(!empty($receipt_details->customer_info))
 					<br/>
-					<b>{{ $receipt_details->customer_label }}</b> <br> {!! $receipt_details->customer_info !!} <br>
+					<b>{{ $receipt_details->customer_label }}</b> {!! $receipt_details->customer_info !!} <br>
 				@endif
 				@if(!empty($receipt_details->client_id_label))
 					<br/>
@@ -276,7 +276,7 @@ table, th, td {
 					@if(!empty($receipt_details->item_discount_label))
 						<th class="text-right" width="10%">{{$receipt_details->item_discount_label}}</th>
 					@endif
-					<th class="text-left" width="15%">{{$receipt_details->table_subtotal_label}}</th>
+					<th class="text-right" width="15%">{{$receipt_details->table_subtotal_label}}</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -380,7 +380,7 @@ table, th, td {
 				@foreach($receipt_details->payments as $payment)
 					<tr>
 						<td>{{$payment['method']}}</td>
-						<td class="text-right" >{{$payment['amount']}}</td>
+						<td class="text-center" >{{$payment['amount']}}</td>
 						<td class="text-right">{{$payment['date']}}</td>
 					</tr>
 				@endforeach
@@ -392,7 +392,7 @@ table, th, td {
 					<th>
 						{!! $receipt_details->total_paid_label !!}
 					</th>
-					<td class="text-left">
+					<td class="text-center">
 						{{$receipt_details->total_paid}}
 					</td>
 				</tr>
@@ -456,7 +456,7 @@ table, th, td {
 							{{$receipt_details->subtotal_exc_tax}}
 						</td>
 					</tr>
-					@foreach($receipt_details->taxes as $k => $v)
+					<!-- @foreach($receipt_details->taxes as $k => $v)
 						@if($k !== 'Total Tax')
 							<tr>
 								<th style="width:70%">
@@ -467,10 +467,10 @@ table, th, td {
 								</td>
 							</tr>
 						@endif
-					@endforeach
+					@endforeach -->
 					@if(!empty($receipt_details->total_exempt_uf))
 					<tr>
-						<th style="width:40%">
+						<th style="width:70%">
 							@lang('lang_v1.exempt')
 						</th>
 						<td class="text-left">
@@ -551,7 +551,24 @@ table, th, td {
 							</td>
 						</tr>
 					@endif
-
+					<!-- Total -->
+					<tr>
+						<th>
+							{!! $receipt_details->total_label !!}
+						</th>
+						<td class="text-left">
+							@if( !empty($receipt_details->discount) )
+								
+								$ {{ number_format(floatval(str_replace(['$', ','], '', $receipt_details->subtotal)) - floatval(str_replace(['$', ','], '', $receipt_details->discount)), 2) }}
+							@else
+								{{$receipt_details->subtotal}}
+							@endif
+							@if(!empty($receipt_details->total_in_words))
+								<br>
+								<small>({{$receipt_details->total_in_words}})</small>
+							@endif
+						</td>
+					</tr>
 					<!-- Tax -->
 					@if( !empty($receipt_details->tax) )
 						<tr>
@@ -559,7 +576,7 @@ table, th, td {
 								{!! $receipt_details->tax_label !!}
 							</th>
 							<td class="text-left">
-								(+) {{$receipt_details->tax}}
+								{{$receipt_details->tax}}
 							</td>
 						</tr>
 					@endif
@@ -575,19 +592,20 @@ table, th, td {
 						</tr>
 					@endif
 
-					<!-- Total -->
+					
 					<tr>
-						<th>
-							{!! $receipt_details->total_label !!}
+						<th style="width:70%">
+							Grand total:
 						</th>
-						<td  class="text-left">
-							{{$receipt_details->total}}
-							@if(!empty($receipt_details->total_in_words))
-								<br>
-								<small>({{$receipt_details->total_in_words}})</small>
-							@endif
+						<td class="text-left">
+							$ {{ number_format(
+								floatval(str_replace(['$', ','], '', $receipt_details->subtotal)) - 
+								floatval(str_replace(['$', ','], '', $receipt_details->discount)) + 
+								floatval(str_replace(['$', ','], '', $receipt_details->tax)),
+								2
+							)}}
+
 						</td>
-					</tr>
 				</tbody>
         	</table>
         </div>

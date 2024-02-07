@@ -259,7 +259,7 @@ $(document).ready(function() {
             if (typeof max != 'undefined' && qty + step > max) {
                 return false;
             }
-
+            console.log("inputinputinputinput==>",input);
             __write_number(input, qty + step);
             input.change();
         } else if ($(this).hasClass('quantity-down')) {

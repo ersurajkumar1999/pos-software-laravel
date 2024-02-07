@@ -1100,7 +1100,7 @@ class TransactionUtil extends Util
         $output['customer_tax_label'] = '';
         $output['customer_custom_fields'] = '';
         if ($il->show_customer == 1) {
-            $output['customer_label'] = !empty($il->customer_label) ? $il->customer_label : '';
+            $output['customer_label'] = !empty($il->customer_label) ? $il->customer_label.": " : '';
             $output['customer_name'] = !empty($customer->name) ? $customer->name: $customer->supplier_business_name;
             $output['customer_mobile'] = $customer->mobile;
             
@@ -2029,7 +2029,8 @@ class TransactionUtil extends Util
                 'unit_price_before_discount' => $this->num_f($line->unit_price_before_discount, false, $business_details),
                 'unit_price_before_discount_uf' => $line->unit_price_before_discount,
                 //Fields for 4th column
-                'line_total' => $this->num_f($line->unit_price_inc_tax * $line->quantity, false, $business_details),
+                'line_total' => $line->quantity * $line->unit_price,
+                // 'line_total' => $this->num_f($line->unit_price_inc_tax * $line->quantity, false, $business_details),
                 'line_total_uf' => $line->unit_price_inc_tax * $line->quantity,
                 'line_total_exc_tax' => $this->num_f($line->unit_price * $line->quantity, false, $business_details),
                 'line_total_exc_tax_uf' => $line->unit_price * $line->quantity,

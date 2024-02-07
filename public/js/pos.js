@@ -284,7 +284,7 @@ $(document).ready(function() {
 
         var tr = $(this).parents('tr');
 
-        var unit_price_inc_tax = __read_number(tr.find('input.pos_unit_price_inc_tax'));
+        var unit_price_inc_tax = __read_number(tr.find('input.input_number'));
         var line_total = entered_qty * unit_price_inc_tax;
 
         __write_number(tr.find('input.pos_line_total'), line_total, false, 2);
@@ -336,7 +336,7 @@ $(document).ready(function() {
             .find('select.tax_id')
             .find(':selected')
             .data('rate');
-        var unit_price_inc_tax = __read_number(tr.find('input.pos_unit_price_inc_tax'));
+        var unit_price_inc_tax = __read_number(tr.find('input.input_number'));
 
         var discounted_unit_price = __get_principle(unit_price_inc_tax, tax_rate);
         var unit_price = get_unit_price_from_discounted_unit_price(tr, discounted_unit_price);
@@ -1728,17 +1728,17 @@ function get_subtotal() {
 }
 
 function calculate_billing_details(price_total) {
-    var discount = pos_discount(price_total);
-    if ($('#reward_point_enabled').length) {
-        total_customer_reward = $('#rp_redeemed_amount').val();
-        discount = parseFloat(discount) + parseFloat(total_customer_reward);
+    // var discount = pos_discount(price_total);
+    // if ($('#reward_point_enabled').length) {
+    //     total_customer_reward = $('#rp_redeemed_amount').val();
+    //     discount = parseFloat(discount) + parseFloat(total_customer_reward);
 
-        if ($('input[name="is_direct_sale"]').length <= 0) {
-            $('span#total_discount').text(__currency_trans_from_en(discount, false));
-        }
-    }
+    //     if ($('input[name="is_direct_sale"]').length <= 0) {
+    //         $('span#total_discount').text(__currency_trans_from_en(discount, false));
+    //     }
+    // }
 
-    var order_tax = pos_order_tax(price_total, discount);
+    var amount_discount_with_order_tax = pos_order_tax();
 
     //Add shipping charges.
     var shipping_charges = __read_number($('input#shipping_charges'));
@@ -1768,7 +1768,8 @@ function calculate_billing_details(price_total) {
         $('#packing_charge_text').text(__currency_trans_from_en(packing_charge, false));
     }
 
-    var total_payable = price_total + order_tax - discount + shipping_charges + packing_charge + additional_expense;
+    // var total_payable = price_total + order_tax - discount + shipping_charges + packing_charge + additional_expense;
+    var total_payable = amount_discount_with_order_tax + shipping_charges + packing_charge + additional_expense;
 
     var rounding_multiple = $('#amount_rounding_method').val() ? parseFloat($('#amount_rounding_method').val()) : 0;
     var round_off_data = __round(total_payable, rounding_multiple);
@@ -1812,8 +1813,7 @@ function pos_discount(total_amount) {
 
     return discount;
 }
-
-function pos_order_tax(price_total, discount) {
+function pos_order_tax_old(price_total, discount) {
     var tax_rate_id = $('#tax_rate_id').val();
     var calculation_type = 'percentage';
     var calculation_amount = __read_number($('#tax_calculation_amount'));
@@ -1828,6 +1828,69 @@ function pos_order_tax(price_total, discount) {
     $('span#order_tax').text(__currency_trans_from_en(order_tax, false));
 
     return order_tax;
+}
+function pos_order_tax(price_total, discount) {
+
+    var calculation_type = 'percentage';
+    var calculation_amount = __read_number($('#tax_calculation_amount'));
+    var total_amount = 0;
+    var total_discount = 0;
+    var total_order_tax = 0;
+    $('table#pos_table tbody tr').each(function() {
+        var item_tax = __read_number($(this).find('input.item_tax'));
+        var quantity = __read_number($(this).find('input.pos_quantity'));
+        console.log("item_tax===>",item_tax);
+        console.log("item_tax===>",quantity);
+
+        var single_product_subtotal = 0;
+        var amount = __read_number($(this).find('input.pos_line_total'));
+        var discount = pos_discount(amount);
+        total_discount += discount;
+        single_product_subtotal = amount - discount;
+        total_amount += single_product_subtotal;
+        let product_tax_id = __read_number($(this).find('input.product_tax_id'));
+        if(product_tax_id){
+            total_order_tax += __calculate_amount(calculation_type, calculation_amount, single_product_subtotal);
+            // total_order_tax += item_tax * quantity;
+        }else{
+            total_order_tax +=  0;
+        }
+    });
+    if ($('#reward_point_enabled').length) {
+        total_customer_reward = $('#rp_redeemed_amount').val();
+        total_discount = parseFloat(total_discount) + parseFloat(total_customer_reward);
+
+        if ($('input[name="is_direct_sale"]').length <= 0) {
+            $('span#total_discount').text(__currency_trans_from_en(total_discount, false));
+        }
+    }
+    $('span.price_total').html(__currency_trans_from_en(total_amount, false));
+    console.log("total_amount===>",total_amount);
+    console.log("total_discount===>",total_discount);
+    console.log("total_order_tax===>",total_order_tax);
+    
+    $('span#order_tax').text(__currency_trans_from_en(total_order_tax, false));
+    $('span#total_discount').text(__currency_trans_from_en(total_discount, false));
+    return total_order_tax + total_amount;
+
+
+
+
+
+    // var tax_rate_id = $('#tax_rate_id').val();
+    // var calculation_type = 'percentage';
+    // var calculation_amount = __read_number($('#tax_calculation_amount'));
+    // var total_amount = price_total - discount;
+
+    // if (tax_rate_id) {
+    //     var order_tax = __calculate_amount(calculation_type, calculation_amount, total_amount);
+    // } else {
+    //     var order_tax = 0;
+    // }
+
+    // $('span#order_tax').text(__currency_trans_from_en(order_tax, false));
+
+    // return order_tax;
 }
 
 function calculate_balance_due() {
@@ -2164,7 +2227,7 @@ $('table#pos_table tbody').on('change', 'input.pos_line_total', function() {
     var subtotal = __read_number($(this));
     var tr = $(this).parents('tr');
     var quantity_element = tr.find('input.pos_quantity');
-    var unit_price_inc_tax = __read_number(tr.find('input.pos_unit_price_inc_tax'));
+    var unit_price_inc_tax = __read_number(tr.find('input.input_number'));
     var quantity = subtotal / unit_price_inc_tax;
     __write_number(quantity_element, quantity);
 
