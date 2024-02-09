@@ -1,7 +1,55 @@
 @extends('layouts.app')
 
 @section('title', __('sale.pos_sale'))
+<style>
+.scroll{
+	background: none !important;
+}	
+.scroll::-webkit-scrollbar {
+  width: 17px !important;
+  border: 5px solid white;
+}
 
+.scroll::-webkit-scrollbar-thumb {
+  background-color: #b0b0b0;
+  background-clip: padding-box;
+  border: 0.05em solid #eeeeee;
+}
+
+.scroll::-webkit-scrollbar-track {
+  background-color: #bbbbbb;
+}
+
+/* Buttons */
+.scroll::-webkit-scrollbar-button:single-button {
+  background-color: #bbbbbb;
+  display: block;
+  border-style: solid ;
+  height: 13px;
+  width: 17px;
+}
+
+/* Up */
+.scroll::-webkit-scrollbar-button:single-button:vertical:decrement {
+  border-width: 0 8px 8px 8px ;
+  border-color: transparent transparent #555555 transparent ;
+}
+
+.scroll::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+  border-color: transparent transparent #777777 transparent ;
+}
+
+/* Down */
+.scroll::-webkit-scrollbar-button:single-button:vertical:increment {
+  border-width: 8px 8px 0 8px;
+  border-color: #555555 transparent transparent transparent ;
+}
+
+.scroll::-webkit-scrollbar-button:vertical:single-button:increment:hover {
+  border-color: #777777 transparent transparent transparent;
+}
+
+</style>
 @section('content')
 <section class="content no-print">
 	<input type="hidden" id="amount_rounding_method" value="{{$pos_settings['amount_rounding_method'] ?? ''}}">
@@ -43,9 +91,9 @@
 						</div>
 					</div>
 					<div class="col-md-2" >
-						<div class="row" style="border: 5px solid; border-color: #001f3f; margin-bottom: 5px;max-height: 500px;
+						<div class="row scroll" style="border: 5px solid; border-color: #001f3f; margin-bottom: 5px;max-height: 500px;position: relative;
     overflow-y: scroll;
-    overflow-x: hidden;">
+">
 							<div class="col-xs-6 offset-xs-0 col-md-12 " style="margin-top: 5px;">
 								<div class="btn btn-success product_category_block" data-value="all" style="display: block !important; text-align: initial !important;">
 									@lang('lang_v1.all_category')
