@@ -346,6 +346,7 @@ var dateRangeSettings = {
 
 //Check for number string in input field, if data-decimal is 0 then don't allow decimal symbol
 $(document).on('keypress', 'input.input_number', function(event) {
+    console.log("input_numberinput_numberinput_number");
     var is_decimal = $(this).data('decimal');
 
     if (is_decimal == 0) {

@@ -400,6 +400,53 @@ class CashRegisterUtil extends Util
                 'product_details' => $product_details
             ];
     }
+    public function getRegisterTransactionDetailSellReturn($open_time, $close_time)
+    {   
+        $business_id = request()->session()->get('user.business_id');
+        $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+                ->join(
+                    'business_locations AS bl',
+                    'transactions.location_id',
+                    '=',
+                    'bl.id'
+                )
+                ->join(
+                    'transactions as T1',
+                    'transactions.return_parent_id',
+                    '=',
+                    'T1.id'
+                )
+                ->leftJoin(
+                    'transaction_payments AS TP',
+                    'transactions.id',
+                    '=',
+                    'TP.transaction_id'
+                )
+                            ->leftJoin(
+                    'users AS returnByUser',
+                    'transactions.created_by',
+                    '=',
+                    'returnByUser.id'
+                )
+                ->where('transactions.business_id', $business_id)
+                ->where('transactions.type', 'sell_return')
+                ->where('transactions.status', 'final')
+                ->select(
+                    'transactions.id',
+                    'transactions.transaction_date',
+                    'transactions.final_total',
+                    'transactions.payment_status',
+                    'T1.id as parent_sale_id',
+                );
+
+            // $sells->whereDate('transactions.transaction_date', '>=', $open_time)
+                    // ->whereDate('transactions.transaction_date', '<=', $close_time);
+            $sells->whereBetween('transactions.transaction_date', [$open_time, $close_time]);
+
+
+        $sells->groupBy('transactions.id');
+        return $sells->get();
+    }
 
     /**
      * Retrieves the currently opened cash register for the user

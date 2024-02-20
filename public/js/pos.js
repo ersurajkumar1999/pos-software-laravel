@@ -1839,8 +1839,6 @@ function pos_order_tax(price_total, discount) {
     $('table#pos_table tbody tr').each(function() {
         var item_tax = __read_number($(this).find('input.item_tax'));
         var quantity = __read_number($(this).find('input.pos_quantity'));
-        console.log("item_tax===>",item_tax);
-        console.log("item_tax===>",quantity);
 
         var single_product_subtotal = 0;
         var amount = __read_number($(this).find('input.pos_line_total'));
@@ -1865,9 +1863,6 @@ function pos_order_tax(price_total, discount) {
         }
     }
     $('span.price_total').html(__currency_trans_from_en(total_amount, false));
-    console.log("total_amount===>",total_amount);
-    console.log("total_discount===>",total_discount);
-    console.log("total_order_tax===>",total_order_tax);
     
     $('span#order_tax').text(__currency_trans_from_en(total_order_tax, false));
     $('span#total_discount').text(__currency_trans_from_en(total_discount, false));
@@ -1894,6 +1889,7 @@ function pos_order_tax(price_total, discount) {
 }
 
 function calculate_balance_due() {
+    console.log("calculate_balance_due==>");
     var total_payable = __read_number($('#final_total_input'));
     var total_paying = 0;
     $('#payment_rows_div')
@@ -1901,6 +1897,7 @@ function calculate_balance_due() {
         .each(function() {
             if (parseFloat($(this).val())) {
                 total_paying += __read_number($(this));
+                console.log("total_paying====>", total_paying);
             }
         });
     var bal_due = total_payable - total_paying;
@@ -3055,7 +3052,17 @@ function loadServiceStaffAvailability(show = true) {
         },
     });
 }
-
+function calEnterValue(val, rowIndex) {
+    var amount = $('#amount_' + rowIndex).val();
+    amount += val;
+    $('#amount_' + rowIndex).val(amount);
+    calculate_balance_due();
+}
+// Clears calculator input screen
+function clearScreenVal(rowIndex) {
+    $('#amount_' + rowIndex).val('');
+    calculate_balance_due();
+}
 $(document).on('hidden.bs.modal', '.view_modal', function(){
     if (service_staff_availability_interval !== null) {
         clearInterval(service_staff_availability_interval);

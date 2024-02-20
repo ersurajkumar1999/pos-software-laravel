@@ -64,7 +64,7 @@
             @endcan
 
             @can('view_cash_register')
-                <button type="button" id="register_details" title="{{ __('cash_register.register_details') }}" class="btn btn-success btn-flat m-6 btn-xs m-5 btn-modal pull-right" data-container=".register_details_modal"
+                <button type="button" id="register_details" title="{{ __('cash_register.register_details') }}" class="btn btn-danger btn-flat m-6 btn-xs m-5 btn-modal pull-right" data-container=".register_details_modal"
                         data-href="{{ action('CashRegisterController@getRegisterDetails')}}">
                     <strong><i class="fa fa-briefcase fa-lg" aria-hidden="true"></i></strong>
                 </button>

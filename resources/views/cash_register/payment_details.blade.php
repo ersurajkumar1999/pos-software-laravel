@@ -217,6 +217,16 @@
       <!--    </small>-->
       <!--  </td>-->
       <!--</tr>-->
+         @if($total_sell_return)
+        <tr class="success">
+          <th>
+            @lang('lang_v1.total_sell_return')
+          </th>
+          <td>
+            <b><span class="display_currency" data-currency_symbol="true">{{ $total_sell_return }}</span></b>
+          </td>
+      </tr>
+      @endif
       <tr class="success">
         <th>
           @lang('lang_v1.total_payment')

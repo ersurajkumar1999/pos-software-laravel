@@ -59,6 +59,7 @@ class SellReturnController extends Controller
 
         $business_id = request()->session()->get('user.business_id');
         if (request()->ajax()) {
+            // dd("hhhh");
             $sells = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
                     
                     ->join(
