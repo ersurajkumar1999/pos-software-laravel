@@ -155,29 +155,18 @@
 		<div id="calculator" name="calculator">
 			<div class="row text-center" id="calc">
 				<div class="calcBG col-md-12 text-center">
-					<!-- <div class="row" id="result">
-						<form name="calc">
-							<input type="text" class="screen text-right" name="result" readonly>
-						</form>
-					</div>
-					<div class="row">
-						<button id="allClear" type="button" class="btn btn-danger" onclick="clearScreen()">AC</button>
-						<button id="clear" type="button" class="btn btn-warning" onclick="clearScreen()">CE</button>
-						<button id="%" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">%</button>
-						<button id="/" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">÷</button>
-					</div> -->
 					<div class="row">
 						<button id="7" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">7</button>
 						<button id="8" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">8</button>
 						<button id="9" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">9</button>
-						<button id="100" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">100</button>
-						<button id="900" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">900</button>
+						<button id="2000" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">2000</button>
+						<button id="5000" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">5000</button>
 					</div>
 					<div class="row">
 						<button id="4" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">4</button>
 						<button id="5" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">5</button>
 						<button id="6" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">6</button>
-						<button id="90" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">90</button>
+						<button id="500" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">500</button>
 						<button id="1000" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">1000</button>
 					</div>
 					<div class="row">
@@ -185,7 +174,7 @@
 						<button id="2" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">2</button>
 						<button id="3" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">3</button>
 						<button id="20" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">20</button>
-						<button id="2000" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">200</button>
+						<button id="100" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">100</button>
 					</div>
 					<div class="row">
 						<button id="0" type="button" class="btn btn-color" onclick="calEnterValue(this.id, {{ $row_index }})">0</button>
