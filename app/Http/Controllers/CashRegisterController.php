@@ -189,7 +189,11 @@ class CashRegisterController extends Controller
         $payment_types = $this->cashRegisterUtil->payment_types($register_details->location_id, true, $business_id);
 
         $pos_settings = !empty(request()->session()->get('business.pos_settings')) ? json_decode(request()->session()->get('business.pos_settings'), true) : [];
+        $sell_returns = $this->cashRegisterUtil->getRegisterTransactionDetailSellReturn($open_time, $close_time);
         $total_sell_return = 0;
+        foreach($sell_returns as $sell_return) {
+            $total_sell_return += $sell_return->final_total;
+        }
         return view('cash_register.close_register_modal')
                     ->with(compact('register_details', 'total_sell_return', 'details', 'payment_types', 'pos_settings'));
     }
