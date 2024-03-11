@@ -1685,7 +1685,7 @@ function pos_each_row(row_obj) {
 
     //var unit_price_inc_tax = __read_number(row_obj.find('input.pos_unit_price_inc_tax'));
 
-    __write_number(row_obj.find('input.item_tax'), unit_price_inc_tax - discounted_unit_price);
+    // __write_number(row_obj.find('input.item_tax'), unit_price_inc_tax - discounted_unit_price);
 }
 
 function pos_total_row() {
@@ -1837,22 +1837,28 @@ function pos_order_tax(price_total, discount) {
     var total_discount = 0;
     var total_order_tax = 0;
     $('table#pos_table tbody tr').each(function() {
-        var item_tax = __read_number($(this).find('input.item_tax'));
+        // var item_tax = __read_number($(this).find('input.item_tax'));
         var quantity = __read_number($(this).find('input.pos_quantity'));
 
         var single_product_subtotal = 0;
+        var price_with_tax = 0;
         var amount = __read_number($(this).find('input.pos_line_total'));
         var discount = pos_discount(amount);
         total_discount += discount;
         single_product_subtotal = amount - discount;
         total_amount += single_product_subtotal;
         let product_tax_id = __read_number($(this).find('input.product_tax_id'));
+        var t_tax = 0;
         if(product_tax_id){
-            total_order_tax += __calculate_amount(calculation_type, calculation_amount, single_product_subtotal);
+            t_tax = __calculate_amount(calculation_type, calculation_amount, single_product_subtotal);
+            total_order_tax += t_tax
             // total_order_tax += item_tax * quantity;
         }else{
             total_order_tax +=  0;
         }
+        price_with_tax = single_product_subtotal + t_tax;
+        __write_number($(this).find('input.item_tax'), t_tax);
+        __write_number($(this).find('input.pos_unit_price_inc_tax'), price_with_tax);
     });
     if ($('#reward_point_enabled').length) {
         total_customer_reward = $('#rp_redeemed_amount').val();

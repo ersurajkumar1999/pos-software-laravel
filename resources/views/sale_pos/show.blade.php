@@ -294,7 +294,7 @@
               </td>
             </tr>
             @if(!empty($line_taxes))
-            <tr>
+            <!-- <tr>
               <th>{{ __('lang_v1.line_taxes') }}:</th>
               <td></td>
               <td class="text-right">
@@ -306,7 +306,7 @@
                 0.00
                 @endif
               </td>
-            </tr>
+            </tr> -->
             @endif
             <tr>
               <th>{{ __('sale.shipping') }}: @if($sell->shipping_details)({{$sell->shipping_details}}) @endif</th>

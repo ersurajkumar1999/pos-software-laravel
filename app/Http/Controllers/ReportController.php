@@ -660,49 +660,50 @@ class ReportController extends Controller
                     $raw_cols[] = $col;
                     $datatable->addColumn($col, function($row) use($tax, $type, $col, $group_taxes) {
                         $tax_amount = 0;
-                        if ($type == 'sell') {
-                            foreach ($row->sell_lines as $sell_line) {
-                                if ($sell_line->tax_id == $tax['id']) {
-                                    $tax_amount += ($sell_line->item_tax * ($sell_line->quantity - $sell_line->quantity_returned) );
-                                }
+                        // if ($type == 'sell') {
+                        //     foreach ($row->sell_lines as $sell_line) {
+                        //         // dd($sell_line);
+                        //         if ($sell_line->tax_id == $tax['id']) {
+                        //             $tax_amount += ($sell_line->item_tax * ($sell_line->quantity - $sell_line->quantity_returned) );
+                        //         }
+                        //         // dd($tax_amount);
+                        //         //break group tax
+                        //         if ($sell_line->line_tax->is_tax_group == 1 && array_key_exists($tax['id'], $group_taxes[$sell_line->tax_id]['sub_taxes'])) {
 
-                                //break group tax
-                                if ($sell_line->line_tax->is_tax_group == 1 && array_key_exists($tax['id'], $group_taxes[$sell_line->tax_id]['sub_taxes'])) {
-
-                                    $group_tax_details = $this->transactionUtil->groupTaxDetails($sell_line->line_tax, $sell_line->item_tax);
+                        //             $group_tax_details = $this->transactionUtil->groupTaxDetails($sell_line->line_tax, $sell_line->item_tax);
                                     
-                                    $sub_tax_share = 0;
-                                    foreach ($group_tax_details as $sub_tax_details) {
-                                        if ($sub_tax_details['id'] == $tax['id']) {
-                                            $sub_tax_share = $sub_tax_details['calculated_tax'];
-                                        }
-                                    }
+                        //             $sub_tax_share = 0;
+                        //             foreach ($group_tax_details as $sub_tax_details) {
+                        //                 if ($sub_tax_details['id'] == $tax['id']) {
+                        //                     $sub_tax_share = $sub_tax_details['calculated_tax'];
+                        //                 }
+                        //             }
 
-                                    $tax_amount += ($sub_tax_share * ($sell_line->quantity - $sell_line->quantity_returned) );
-                                }
-                            }
-                        } elseif ($type == 'purchase') {
-                            foreach ($row->purchase_lines as $purchase_line) {
-                                if ($purchase_line->tax_id == $tax['id']) {
-                                    $tax_amount += ($purchase_line->item_tax * ($purchase_line->quantity - $purchase_line->quantity_returned));
-                                }
+                        //             $tax_amount += ($sub_tax_share * ($sell_line->quantity - $sell_line->quantity_returned) );
+                        //         }
+                        //     }
+                        // } elseif ($type == 'purchase') {
+                        //     foreach ($row->purchase_lines as $purchase_line) {
+                        //         if ($purchase_line->tax_id == $tax['id']) {
+                        //             $tax_amount += ($purchase_line->item_tax * ($purchase_line->quantity - $purchase_line->quantity_returned));
+                        //         }
 
-                                //break group tax
-                                if ($purchase_line->line_tax->is_tax_group == 1 && array_key_exists($tax['id'], $group_taxes[$purchase_line->tax_id]['sub_taxes'])) {
+                        //         //break group tax
+                        //         if ($purchase_line->line_tax->is_tax_group == 1 && array_key_exists($tax['id'], $group_taxes[$purchase_line->tax_id]['sub_taxes'])) {
 
-                                    $group_tax_details = $this->transactionUtil->groupTaxDetails($purchase_line->line_tax, $purchase_line->item_tax);
+                        //             $group_tax_details = $this->transactionUtil->groupTaxDetails($purchase_line->line_tax, $purchase_line->item_tax);
                                     
-                                    $sub_tax_share = 0;
-                                    foreach ($group_tax_details as $sub_tax_details) {
-                                        if ($sub_tax_details['id'] == $tax['id']) {
-                                            $sub_tax_share = $sub_tax_details['calculated_tax'];
-                                        }
-                                    }
+                        //             $sub_tax_share = 0;
+                        //             foreach ($group_tax_details as $sub_tax_details) {
+                        //                 if ($sub_tax_details['id'] == $tax['id']) {
+                        //                     $sub_tax_share = $sub_tax_details['calculated_tax'];
+                        //                 }
+                        //             }
 
-                                    $tax_amount += ($sub_tax_share * ($purchase_line->quantity - $purchase_line->quantity_returned) );
-                                }
-                            }
-                        }
+                        //             $tax_amount += ($sub_tax_share * ($purchase_line->quantity - $purchase_line->quantity_returned) );
+                        //         }
+                        //     }
+                        // }
                         if ($row->tax_id == $tax['id']) {
                             $tax_amount += $row->tax_amount;
                         }
@@ -1718,7 +1719,6 @@ class ReportController extends Controller
         if (!auth()->user()->can('purchase_n_sell_report.view')) {
             abort(403, 'Unauthorized action.');
         }
-
         $business_id = $request->session()->get('user.business_id');
         if ($request->ajax()) {
             $variation_id = $request->get('variation_id', null);
@@ -1754,13 +1754,16 @@ class ReportController extends Controller
                     'c.contact_id',
                     't.id as transaction_id',
                     't.invoice_no',
+                    't.tax_amount',
+                    't.discount_amount',
+                    't.discount_type',
                     't.transaction_date as transaction_date',
                     'transaction_sell_lines.unit_price_before_discount as unit_price',
                     'transaction_sell_lines.unit_price_inc_tax as unit_sale_price',
                     DB::raw('(transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) as sell_qty'),
             		DB::raw('ROUND((transaction_sell_lines.quantity - transaction_sell_lines.quantity_returned) * v.dpp_inc_tax,2) as goods_price'),
-                    'transaction_sell_lines.line_discount_type as discount_type',
-                    'transaction_sell_lines.line_discount_amount as discount_amount',
+                    // 'transaction_sell_lines.line_discount_type as discount_type',
+                    // 'transaction_sell_lines.line_discount_amount as discount_amount',
                     'transaction_sell_lines.item_tax',
                     'tax_rates.name as tax',
                     'u.short_name as unit',
