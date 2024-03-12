@@ -658,6 +658,7 @@ class ProductUtil extends Util
         // Sub Total
         $output['tax'] = 0;
         $tax_amount = 0;
+        $index = 1;
         foreach ($products as $product) {
             $unit_price = $uf_number ? $this->num_uf($product['unit_price']) : $product['unit_price'];
             // dd($unit_price);
@@ -667,11 +668,15 @@ class ProductUtil extends Util
             if (is_array($discount)) {
                 $discount_amount = $uf_number ? $this->num_uf($discount['discount_amount']) : $discount['discount_amount'];
                 if ($discount['discount_type'] == 'fixed') {
-                    $d_amount = $discount_amount;
+                    $d_amount = 0;
+                    if($index == 1){
+                        $d_amount = $discount_amount;
+                    }
                 } else {
                     $d_amount = ($discount_amount/100) * $unit_price;
                 }
             }
+            $index += 1;
             if (!empty($tax_id)) {
                 $output['tax_id'] = $tax_id;
                 $tax_details = TaxRate::find($tax_id);

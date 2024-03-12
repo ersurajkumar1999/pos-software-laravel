@@ -1832,10 +1832,13 @@ function pos_order_tax_old(price_total, discount) {
 function pos_order_tax(price_total, discount) {
 
     var calculation_type = 'percentage';
+    var cal_type = $('#discount_type').val();
     var calculation_amount = __read_number($('#tax_calculation_amount'));
     var total_amount = 0;
     var total_discount = 0;
     var total_order_tax = 0;
+    var index = 1;
+
     $('table#pos_table tbody tr').each(function() {
         // var item_tax = __read_number($(this).find('input.item_tax'));
         var quantity = __read_number($(this).find('input.pos_quantity'));
@@ -1843,7 +1846,15 @@ function pos_order_tax(price_total, discount) {
         var single_product_subtotal = 0;
         var price_with_tax = 0;
         var amount = __read_number($(this).find('input.pos_line_total'));
-        var discount = pos_discount(amount);
+        var discount = 0;
+        if(cal_type == "fixed"){
+            discount = 0;
+            if(index == 1){
+                discount = pos_discount(amount);
+            }
+        }else{
+            discount = pos_discount(amount);
+        }
         total_discount += discount;
         single_product_subtotal = amount - discount;
         total_amount += single_product_subtotal;
@@ -1859,6 +1870,7 @@ function pos_order_tax(price_total, discount) {
         price_with_tax = single_product_subtotal + t_tax;
         __write_number($(this).find('input.item_tax'), t_tax);
         __write_number($(this).find('input.pos_unit_price_inc_tax'), price_with_tax);
+        index += 1; 
     });
     if ($('#reward_point_enabled').length) {
         total_customer_reward = $('#rp_redeemed_amount').val();
@@ -1873,25 +1885,6 @@ function pos_order_tax(price_total, discount) {
     $('span#order_tax').text(__currency_trans_from_en(total_order_tax, false));
     $('span#total_discount').text(__currency_trans_from_en(total_discount, false));
     return total_order_tax + total_amount;
-
-
-
-
-
-    // var tax_rate_id = $('#tax_rate_id').val();
-    // var calculation_type = 'percentage';
-    // var calculation_amount = __read_number($('#tax_calculation_amount'));
-    // var total_amount = price_total - discount;
-
-    // if (tax_rate_id) {
-    //     var order_tax = __calculate_amount(calculation_type, calculation_amount, total_amount);
-    // } else {
-    //     var order_tax = 0;
-    // }
-
-    // $('span#order_tax').text(__currency_trans_from_en(order_tax, false));
-
-    // return order_tax;
 }
 
 function calculate_balance_due() {
