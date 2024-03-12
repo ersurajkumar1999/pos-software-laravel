@@ -318,7 +318,7 @@ $(document).ready(function() {
         var quantity = __read_number(tr.find('input.pos_quantity'));
 
         var unit_price_inc_tax = __add_percent(discounted_unit_price, tax_rate);
-        var line_total = quantity * unit_price_inc_tax;
+        var line_total = quantity * unit_price;
 
         __write_number(tr.find('input.pos_unit_price_inc_tax'), unit_price_inc_tax);
         __write_number(tr.find('input.pos_line_total'), line_total);
