@@ -72,6 +72,15 @@
 						<div class="box-body pb-0">
 							{!! Form::hidden('location_id', $default_location->id ?? null , ['id' => 'location_id', 'data-receipt_printer_type' => !empty($default_location->receipt_printer_type) ? $default_location->receipt_printer_type : 'browser', 'data-default_payment_accounts' => $default_location->default_payment_accounts ?? '']); !!}
 							<!-- sub_type -->
+							<div class="row">
+								<div class="col-md-6">
+									<div class="checkbox">
+										<label>
+											{!! Form::checkbox('is_quotation', '1', false, ['class' => 'input-icheck is_quotation']); !!} Is Quotation
+										</label>
+									</div>
+								</div>
+							</div>
 							{!! Form::hidden('sub_type', isset($sub_type) ? $sub_type : null) !!}
 							<input type="hidden" id="item_addition_method" value="{{$business_details->item_addition_method}}">
 								@include('sale_pos.partials.pos_form')

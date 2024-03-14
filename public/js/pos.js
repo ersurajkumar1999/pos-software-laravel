@@ -1584,12 +1584,13 @@ function pos_product_row(variation_id = null, purchase_line_id = null, weighing_
             $('#types_of_service_price_group').val()) {
             price_group = $('#types_of_service_price_group').val();
         }
-        
+        var is_quotation = ($(".is_quotation").is(':checked'));
         $.ajax({
             method: 'GET',
             url: '/sells/pos/get_product_row/' + variation_id + '/' + location_id,
             async: false,
             data: {
+                is_quotation:is_quotation,
                 product_row: product_row,
                 customer_id: customer_id,
                 is_direct_sell: is_direct_sell,
@@ -1604,6 +1605,13 @@ function pos_product_row(variation_id = null, purchase_line_id = null, weighing_
             dataType: 'json',
             success: function(result) {
                 if (result.success) {
+                    if(result.item_out_of_stock){
+                        disable_pos_form_actions();
+                        
+                        $('#pos-quotation').removeAttr('disabled');
+                        $('#pos-cancel').removeAttr('disabled');
+                        console.log("item_out_of_stock==>",result.item_out_of_stock);
+                    }
                     $('table#pos_table tbody')
                         .append(result.html_content)
                         .find('input.pos_quantity');
@@ -2580,6 +2588,8 @@ function disable_pos_form_actions(){
 }
 
 function enable_pos_form_actions(){
+    
+    $('.is_quotation').prop('checked', false); // Unchecks it
     $('div.pos-processing').hide();
     $('#pos-save').removeAttr('disabled');
     $('div.pos-form-actions').find('button').removeAttr('disabled');

@@ -1518,7 +1518,7 @@ class SellPosController extends Controller
         ];
     }
 
-    private function getSellLineRow($variation_id, $location_id, $quantity, $row_count, $is_direct_sell, $so_line = null,$weight_scale = null)
+    private function getSellLineRow($variation_id, $location_id, $quantity, $row_count, $is_direct_sell, $so_line = null,$weight_scale = null, $is_quotation = false)
     {
         $business_id = request()->session()->get('user.business_id');
         $business_details = $this->businessUtil->getDetails($business_id);
@@ -1540,17 +1540,17 @@ class SellPosController extends Controller
         if (request()->input('disable_qty_alert') === 'true') {
             $pos_settings['allow_overselling'] = true;
         }
-
-        $product = $this->productUtil->getDetailsFromVariation($variation_id, $business_id, $location_id, $check_qty);
-
+        $product = $this->productUtil->getDetailsFromVariation($variation_id, $business_id, $location_id, $check_qty, $is_quotation);
         if (!isset($product->quantity_ordered)) {
             $product->quantity_ordered = $quantity;
         }
 
         $product->secondary_unit_quantity = !isset($product->secondary_unit_quantity) ? 0 : $product->secondary_unit_quantity;
-
+        $output['item_out_of_stock'] = false;
         $product->formatted_qty_available = $this->productUtil->num_f($product->qty_available, false, null, true);
-
+        if(!$product->formatted_qty_available){
+            $output['item_out_of_stock'] = true;
+        }
         $sub_units = $this->productUtil->getSubUnits($business_id, $product->unit_id, false, $product->product_id);
 
         //Get customer group and change the price accordingly
@@ -1660,8 +1660,8 @@ class SellPosController extends Controller
     public function getProductRow($variation_id, $location_id)
     {
         $output = [];
-
         try {
+            $is_quotation = request()->get('is_quotation');
             $row_count = request()->get('product_row');
             $weight_scale = request()->get('weight_scale');
             $row_count = $row_count + 1;
@@ -1683,8 +1683,7 @@ class SellPosController extends Controller
                     return $output;
                 }
             }
-
-            $output = $this->getSellLineRow($variation_id, $location_id, $quantity, $row_count, $is_direct_sell,null,$weight_scale);
+            $output = $this->getSellLineRow($variation_id, $location_id, $quantity, $row_count, $is_direct_sell,null,$weight_scale, $is_quotation);
 
             if ($this->transactionUtil->isModuleEnabled('modifiers')  && !$is_direct_sell) {
                 $variation = Variation::find($variation_id);

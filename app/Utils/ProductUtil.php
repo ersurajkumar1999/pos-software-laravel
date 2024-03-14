@@ -459,7 +459,7 @@ class ProductUtil extends Util
      *
      * @return array
      */
-    public function getDetailsFromVariation($variation_id, $business_id, $location_id = null, $check_qty = true)
+    public function getDetailsFromVariation($variation_id, $business_id, $location_id = null, $check_qty = true, $is_quotation= false)
     {
         $query = Variation::join('products AS p', 'variations.product_id', '=', 'p.id')
                 ->join('product_variations AS pv', 'variations.product_variation_id', '=', 'pv.id')
@@ -475,10 +475,12 @@ class ProductUtil extends Util
 
         //Add condition for check of quantity. (if stock is not enabled or qty_available > 0)
         if ($check_qty) {
-            $query->where(function ($query) use ($location_id) {
-                $query->where('p.enable_stock', '!=', 1)
-                    ->orWhere('vld.qty_available', '>', 0);
-            });
+            if($is_quotation == 'false'){
+                $query->where(function ($query) use ($location_id) {
+                    $query->where('p.enable_stock', '!=', 1)
+                        ->orWhere('vld.qty_available', '>', 0);
+                });
+            }
         }
         
         if (!empty($location_id) && $check_qty) {
