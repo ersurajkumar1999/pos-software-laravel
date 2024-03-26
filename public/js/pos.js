@@ -146,6 +146,7 @@ $(document).ready(function() {
                 source: function(request, response) {
                     var price_group = '';
                     var search_fields = [];
+                    var is_quotation = ($(".is_quotation").is(':checked'));
                     $('.search_fields:checked').each(function(i){
                       search_fields[i] = $(this).val();
                     });
@@ -156,6 +157,7 @@ $(document).ready(function() {
                     $.getJSON(
                         '/products/list',
                         {
+                            is_quotation:is_quotation,
                             price_group: price_group,
                             location_id: $('input#location_id').val(),
                             term: request.term,
@@ -169,7 +171,6 @@ $(document).ready(function() {
                 response: function(event, ui) {
                     if (ui.content.length == 1) {
                         ui.item = ui.content[0];
-
                         var is_overselling_allowed = false;
                         if($('input#is_overselling_allowed').length) {
                             is_overselling_allowed = true;
@@ -197,28 +198,44 @@ $(document).ready(function() {
                     }
                 },
                 select: function(event, ui) {
+                    console.log("ui.item.enable_stock select",);
                     var searched_term = $(this).val();
                     var is_overselling_allowed = false;
+                    var is_quotation = ($(".is_quotation").is(':checked'));
                     if($('input#is_overselling_allowed').length) {
                         is_overselling_allowed = true;
                     }
+                    
                     var for_so = false;
                     if ($('#sale_type').length && $('#sale_type').val() == 'sales_order') {
                         for_so = true;
                     }
-
+                    console.log("ui.item.enable_stock==>");
                     if (ui.item.enable_stock != 1 || ui.item.qty_available > 0 || is_overselling_allowed || for_so) {
+                        console.log("ui.item.enable_stock if");
                         $(this).val(null);
-
                         //Pre select lot number only if the searched term is same as the lot number
                         var purchase_line_id = ui.item.purchase_line_id && searched_term == ui.item.lot_number ? ui.item.purchase_line_id : null;
                         pos_product_row(ui.item.variation_id, purchase_line_id,null,'',ui.item.weight_scale);
                     } else {
-                        alert(LANG.out_of_stock);
+                        console.log("ui.item.enable_stock else",is_quotation);
+                        if(is_quotation){
+                            disable_pos_form_actions();
+                            
+                            $('#pos-quotation').removeAttr('disabled');
+                            $('#pos-cancel').removeAttr('disabled');
+                            $(this).val(null);
+                            //Pre select lot number only if the searched term is same as the lot number
+                            var purchase_line_id = ui.item.purchase_line_id && searched_term == ui.item.lot_number ? ui.item.purchase_line_id : null;
+                            pos_product_row(ui.item.variation_id, purchase_line_id,null,'',ui.item.weight_scale);
+                        }else{
+                            alert(LANG.out_of_stock);
+                        }
                     }
                 },
             })
             .autocomplete('instance')._renderItem = function(ul, item) {
+                console.log("autocomplete =>ui");
                 var is_overselling_allowed = false;
                 if($('input#is_overselling_allowed').length) {
                     is_overselling_allowed = true;
@@ -337,7 +354,7 @@ $(document).ready(function() {
             .find(':selected')
             .data('rate');
         var unit_price_inc_tax = __read_number(tr.find('input.input_number'));
-
+        
         var discounted_unit_price = __get_principle(unit_price_inc_tax, tax_rate);
         var unit_price = get_unit_price_from_discounted_unit_price(tr, discounted_unit_price);
         __write_number(tr.find('input.pos_unit_price'), unit_price);
@@ -364,6 +381,10 @@ $(document).ready(function() {
         var line_total = quantity * unit_price_inc_tax;
         var discounted_unit_price = __get_principle(unit_price_inc_tax, tax_rate);
         var unit_price = get_unit_price_from_discounted_unit_price(tr, discounted_unit_price);
+
+        console.log("line_total==>",line_total);
+        console.log("discounted_unit_price==>",discounted_unit_price);
+        console.log("unit_price==>",unit_price);
 
         __write_number(tr.find('input.pos_unit_price'), unit_price);
         __write_number(tr.find('input.pos_line_total'), line_total, false, 2);
@@ -442,10 +463,10 @@ $(document).ready(function() {
         'select.row_discount_type, input.row_discount_amount',
         function() {
             var tr = $(this).parents('tr');
+            var this_unit_price = __read_number(tr.find('input.pos_unit_price'));
 
             //calculate discounted unit price
             var discounted_unit_price = calculate_discounted_unit_price(tr);
-
             var tax_rate = tr
                 .find('select.tax_id')
                 .find(':selected')
@@ -454,10 +475,17 @@ $(document).ready(function() {
 
             var unit_price_inc_tax = __add_percent(discounted_unit_price, tax_rate);
             var line_total = quantity * unit_price_inc_tax;
+            var this_total_unit_price = quantity * this_unit_price;
+            console.log("discounted_unit_price==>",discounted_unit_price);
+            console.log("quantity==>",quantity);
+            console.log("unit_price_inc_tax==>",unit_price_inc_tax);
+            console.log("discounted_unit_price==>",discounted_unit_price);
+            console.log("line_total=>",line_total);
+            console.log("this_total_unit_price==>",this_total_unit_price);
 
-            __write_number(tr.find('input.pos_unit_price_inc_tax'), unit_price_inc_tax);
-            __write_number(tr.find('input.pos_line_total'), line_total, false, 2);
-            tr.find('span.pos_line_total_text').text(__currency_trans_from_en(line_total, true));
+            // __write_number(tr.find('input.pos_unit_price_inc_tax'), unit_price_inc_tax);
+            __write_number(tr.find('input.pos_line_total'), this_total_unit_price, false, 2);
+            tr.find('span.pos_line_total_text').text(__currency_trans_from_en(this_total_unit_price, true));
             pos_each_row(tr);
             pos_total_row();
             round_row_to_iraqi_dinnar(tr);
@@ -481,6 +509,8 @@ $(document).ready(function() {
             dangerMode: true,
         }).then(confirm => {
             if (confirm) {
+                $('.is_quotation').prop('checked', false).css('display', 'none').css('display', 'block');
+                enable_pos_form_actions();
                 reset_pos_form();
             }
         });
@@ -1610,7 +1640,6 @@ function pos_product_row(variation_id = null, purchase_line_id = null, weighing_
                         
                         $('#pos-quotation').removeAttr('disabled');
                         $('#pos-cancel').removeAttr('disabled');
-                        console.log("item_out_of_stock==>",result.item_out_of_stock);
                     }
                     $('table#pos_table tbody')
                         .append(result.html_content)
@@ -1688,9 +1717,13 @@ function pos_each_row(row_obj) {
     if (discount > 0) {
         var qty = __read_number(row_obj.find('input.pos_quantity'));
         var line_total = qty * unit_price_inc_tax;
-        __write_number(row_obj.find('input.pos_line_total'), line_total);
+        __write_number(row_obj.find('input.pos_line_total'), discounted_unit_price);
     }
-
+    console.log("unit_price==>",unit_price);
+    console.log("discounted_unit_price==>",discounted_unit_price);
+    console.log("unit_price_inc_tax==>",unit_price_inc_tax);
+    console.log("discount==>",discount);
+    console.log("line_total==>", line_total);
     //var unit_price_inc_tax = __read_number(row_obj.find('input.pos_unit_price_inc_tax'));
 
     // __write_number(row_obj.find('input.item_tax'), unit_price_inc_tax - discounted_unit_price);
@@ -1896,7 +1929,6 @@ function pos_order_tax(price_total, discount) {
 }
 
 function calculate_balance_due() {
-    console.log("calculate_balance_due==>");
     var total_payable = __read_number($('#final_total_input'));
     var total_paying = 0;
     $('#payment_rows_div')
@@ -1904,7 +1936,6 @@ function calculate_balance_due() {
         .each(function() {
             if (parseFloat($(this).val())) {
                 total_paying += __read_number($(this));
-                console.log("total_paying====>", total_paying);
             }
         });
     var bal_due = total_payable - total_paying;
@@ -2588,7 +2619,6 @@ function disable_pos_form_actions(){
 }
 
 function enable_pos_form_actions(){
-    
     $('.is_quotation').prop('checked', false); // Unchecks it
     $('div.pos-processing').hide();
     $('#pos-save').removeAttr('disabled');
@@ -3069,6 +3099,7 @@ function calEnterValue(val, rowIndex) {
 }
 // Clears calculator input screen
 function clearScreenVal(rowIndex) {
+    $('.is_quotation').prop('checked', false); // Unchecks it
     $('#amount_' + rowIndex).val('');
     calculate_balance_due();
 }

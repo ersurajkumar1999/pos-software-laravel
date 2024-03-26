@@ -1341,6 +1341,7 @@ class TransactionUtil extends Util
                     $total_exempt += $line['line_total_uf'];
                 }
                 $subtotal_exc_tax += $line['line_total_exc_tax_uf'];
+                // $subtotal_exc_tax += $line['unit_price_before_discount_uf'];
                 $total_quantity += $line['quantity_uf'];
                 $total_line_discount += ($line['line_discount_uf'] * $line['quantity_uf']);
                 $total_line_taxes += ($line['tax_unformatted'] * $line['quantity_uf']);

@@ -74,11 +74,10 @@
 							<!-- sub_type -->
 							<div class="row">
 								<div class="col-md-6">
-									<div class="checkbox">
-										<label>
-											{!! Form::checkbox('is_quotation', '1', false, ['class' => 'input-icheck is_quotation']); !!} Is Quotation
-										</label>
-									</div>
+								<div class="checkbox">
+									<input style="margin-left:1%" type="checkbox" id="is_quotation" class="is_quotation">
+									<label for="is_quotation">Is Quotation</label>
+								</div>
 								</div>
 							</div>
 							{!! Form::hidden('sub_type', isset($sub_type) ? $sub_type : null) !!}

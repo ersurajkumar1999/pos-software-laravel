@@ -366,10 +366,9 @@ class SellPosController extends Controller
                 }
         
                 $user_id = $request->session()->get('user.id');
-
                 $discount = ['discount_type' => $input['discount_type'],
-                                'discount_amount' => $input['discount_amount']
-                            ];
+                'discount_amount' => $input['discount_amount']
+            ];
                 $invoice_total = $this->productUtil->calculateInvoiceTotal($input['products'], $input['tax_rate_id'], $discount);
 
                 DB::beginTransaction();
@@ -733,7 +732,6 @@ class SellPosController extends Controller
         $receipt_printer_type = is_null($printer_type) ? $location_details->receipt_printer_type : $printer_type;
 
         $receipt_details = $this->transactionUtil->getReceiptDetails($transaction_id, $location_id, $invoice_layout, $business_details, $location_details, $receipt_printer_type);
-
         $currency_details = [
             'symbol' => $business_details->currency_symbol,
             'thousand_separator' => $business_details->thousand_separator,
@@ -1536,15 +1534,14 @@ class SellPosController extends Controller
         if ($is_sales_order || !empty($so_line)) {
             $check_qty = false;
         }
-
         if (request()->input('disable_qty_alert') === 'true') {
             $pos_settings['allow_overselling'] = true;
         }
         $product = $this->productUtil->getDetailsFromVariation($variation_id, $business_id, $location_id, $check_qty, $is_quotation);
+        // dd($product);
         if (!isset($product->quantity_ordered)) {
             $product->quantity_ordered = $quantity;
         }
-
         $product->secondary_unit_quantity = !isset($product->secondary_unit_quantity) ? 0 : $product->secondary_unit_quantity;
         $output['item_out_of_stock'] = false;
         $product->formatted_qty_available = $this->productUtil->num_f($product->qty_available, false, null, true);
@@ -1684,7 +1681,6 @@ class SellPosController extends Controller
                 }
             }
             $output = $this->getSellLineRow($variation_id, $location_id, $quantity, $row_count, $is_direct_sell,null,$weight_scale, $is_quotation);
-
             if ($this->transactionUtil->isModuleEnabled('modifiers')  && !$is_direct_sell) {
                 $variation = Variation::find($variation_id);
                 $business_id = request()->session()->get('user.business_id');
@@ -1699,7 +1695,6 @@ class SellPosController extends Controller
             }
         } catch (\Exception $e) {
             \Log::emergency("File:" . $e->getFile(). "Line:" . $e->getLine(). "Message:" . $e->getMessage());
-
             $output['success'] = false;
             $output['msg'] = __('lang_v1.item_out_of_stock');
         }

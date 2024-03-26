@@ -393,7 +393,7 @@ table, th, td {
 						{!! $receipt_details->total_paid_label !!}
 					</th>
 					<td class="text-center">
-						{{$receipt_details->total_paid}}
+						{{$receipt_details->total_paid}} 
 					</td>
 				</tr>
 			@endif
@@ -453,7 +453,11 @@ table, th, td {
 							{!! $receipt_details->subtotal_label !!}
 						</th>
 						<td class="text-left">
+						@if( !empty($receipt_details->total_line_discount) )
+							{{$receipt_details->subtotal}}	
+						@else
 							{{$receipt_details->subtotal_exc_tax}}
+						@endif
 						</td>
 					</tr>
 					<!-- @foreach($receipt_details->taxes as $k => $v)
@@ -561,7 +565,7 @@ table, th, td {
 								
 								$ {{ number_format(floatval(str_replace(['$', ','], '', $receipt_details->subtotal)) - floatval(str_replace(['$', ','], '', $receipt_details->discount)), 2) }}
 							@else
-								{{$receipt_details->subtotal}}
+								{{$receipt_details->subtotal_exc_tax}}
 							@endif
 							@if(!empty($receipt_details->total_in_words))
 								<br>
@@ -600,6 +604,7 @@ table, th, td {
 						<td class="text-left">
 							$ {{ number_format(
 								floatval(str_replace(['$', ','], '', $receipt_details->subtotal)) - 
+								floatval(str_replace(['$', ','], '', $receipt_details->total_line_discount)) - 
 								floatval(str_replace(['$', ','], '', $receipt_details->discount)) + 
 								floatval(str_replace(['$', ','], '', $receipt_details->tax)),
 								2

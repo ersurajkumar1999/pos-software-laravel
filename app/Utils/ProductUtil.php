@@ -472,7 +472,6 @@ class ProductUtil extends Util
                 })
                 ->where('p.business_id', $business_id)
                 ->where('variations.id', $variation_id);
-
         //Add condition for check of quantity. (if stock is not enabled or qty_available > 0)
         if ($check_qty) {
             if($is_quotation == 'false'){
@@ -480,16 +479,19 @@ class ProductUtil extends Util
                     $query->where('p.enable_stock', '!=', 1)
                         ->orWhere('vld.qty_available', '>', 0);
                 });
+                
             }
         }
-        
         if (!empty($location_id) && $check_qty) {
             //Check for enable stock, if enabled check for location id.
+            if($is_quotation == 'false'){
             $query->where(function ($query) use ($location_id) {
                 $query->where('p.enable_stock', '!=', 1)
                             ->orWhere('vld.location_id', $location_id);
             });
         }
+        }
+        
         
         $product = $query->select(
             DB::raw("IF(pv.is_dummy = 0, CONCAT(p.name, 
@@ -661,6 +663,7 @@ class ProductUtil extends Util
         $output['tax'] = 0;
         $tax_amount = 0;
         $index = 1;
+        $total_discount = 0;
         foreach ($products as $product) {
             $unit_price = $uf_number ? $this->num_uf($product['unit_price']) : $product['unit_price'];
             // dd($unit_price);
@@ -669,6 +672,7 @@ class ProductUtil extends Util
             $d_amount = 0;
             if (is_array($discount)) {
                 $discount_amount = $uf_number ? $this->num_uf($discount['discount_amount']) : $discount['discount_amount'];
+                $line_discount_amount = $uf_number ? $this->num_uf($product['line_discount_amount']) : $product['line_discount_amount'];
                 if ($discount['discount_type'] == 'fixed') {
                     $d_amount = 0;
                     if($index == 1){
@@ -678,6 +682,15 @@ class ProductUtil extends Util
                     $d_amount = ($discount_amount/100) * $unit_price;
                 }
             }
+            if ($product['line_discount_type'] == 'fixed') {
+                if($index == 1){
+                    $d_amount += $line_discount_amount;
+                }
+            } else {
+                $d_amount += ($line_discount_amount/100) * $unit_price;
+                $total_discount += $d_amount;
+            }
+            
             $index += 1;
             if (!empty($tax_id)) {
                 $output['tax_id'] = $tax_id;
@@ -690,6 +703,9 @@ class ProductUtil extends Util
                 }
             }
         }
+        //change Calculate discount
+        // dd($total_discount);
+        // $output['discount'] = $total_discount;
         $output['tax'] = $tax_amount;
 
         // //Tax

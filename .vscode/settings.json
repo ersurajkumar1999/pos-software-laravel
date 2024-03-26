@@ -14,5 +14,6 @@
         "resources/plugins/AdminLTE/plugins/datepicker/locales",
         "resources/plugins/AdminLTE/plugins/select2/lang",
         "resources/plugins/jquery-validation-1.16.0/demo/tinymce/themes/simple/langs"
-    ]
+    ],
+    "i18n-ally.keystyle": "nested"
 }
