@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" style="display: none;">
   <div class="col-md-12">
     <hr>
     <h3>@lang('lang_v1.product_sold_details_register')</h3>
@@ -93,7 +93,7 @@
     </table>
   </div>
 </div>
-<div class="row">
+<div class="row" style="display: none;">
   <div class="col-md-12">
     <hr>
     <h3>@lang('lang_v1.product_sold_details_register') (@lang('lang_v1.by_brand'))</h3>

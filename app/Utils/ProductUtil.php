@@ -671,8 +671,12 @@ class ProductUtil extends Util
             $product_quantity = $product['quantity'];
             $d_amount = 0;
             if (is_array($discount)) {
-                $discount_amount = $uf_number ? $this->num_uf($discount['discount_amount']) : $discount['discount_amount'];
-                $line_discount_amount = $uf_number ? $this->num_uf($product['line_discount_amount']) : $product['line_discount_amount'];
+                if (isset($product['line_discount_type'])) {
+                    $line_discount_type = $product['line_discount_type'];
+                } else {
+                    $line_discount_type = 0; // Or you can set it to any default value you prefer
+                }                $discount_amount = $uf_number ? $this->num_uf($discount['discount_amount']) : $discount['discount_amount'];
+                $line_discount_amount = $uf_number ? $this->num_uf($line_discount_type) : $line_discount_type;
                 if ($discount['discount_type'] == 'fixed') {
                     $d_amount = 0;
                     if($index == 1){
@@ -682,13 +686,15 @@ class ProductUtil extends Util
                     $d_amount = ($discount_amount/100) * $unit_price;
                 }
             }
-            if ($product['line_discount_type'] == 'fixed') {
-                if($index == 1){
-                    $d_amount += $line_discount_amount;
+            if($line_discount_type){
+                if ($product['line_discount_type'] == 'fixed') {
+                    if($index == 1){
+                        $d_amount += $line_discount_amount;
+                    }
+                } else {
+                    $d_amount += ($line_discount_amount/100) * $unit_price;
+                    $total_discount += $d_amount;
                 }
-            } else {
-                $d_amount += ($line_discount_amount/100) * $unit_price;
-                $total_discount += $d_amount;
             }
             
             $index += 1;
