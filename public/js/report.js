@@ -926,7 +926,7 @@ $(document).ready(function() {
             { data: 'transaction_date', name: 't.transaction_date' },
             { data: 'sell_qty', name: 'transaction_sell_lines.quantity' },
             { data: 'dpp_inc_tax', name: 'v.dpp_inc_tax' },
-            { data: 'goods_price', name: 'goods_price' },
+            { data: 'goods_price', name: 'goods_price', searchable: false },
             { data: 'unit_price', name: 'transaction_sell_lines.unit_price_before_discount' },
             { data: 'discount_amount', name: 'transaction_sell_lines.line_discount_amount' },
             { data: 'tax', name: 'tax_rates.name' },
