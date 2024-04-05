@@ -474,7 +474,7 @@ class ProductUtil extends Util
                 ->where('variations.id', $variation_id);
         //Add condition for check of quantity. (if stock is not enabled or qty_available > 0)
         if ($check_qty) {
-            if($is_quotation == 'false'){
+            if($is_quotation == false || $is_quotation == 'false' || $is_quotation == "false"){
                 $query->where(function ($query) use ($location_id) {
                     $query->where('p.enable_stock', '!=', 1)
                         ->orWhere('vld.qty_available', '>', 0);
@@ -482,9 +482,11 @@ class ProductUtil extends Util
                 
             }
         }
+        // dd($is_quotation);
         if (!empty($location_id) && $check_qty) {
             //Check for enable stock, if enabled check for location id.
-            if($is_quotation == 'false'){
+            if($is_quotation == false || $is_quotation == 'false' || $is_quotation == "false"){
+                // dd($is_quotation, $variation_id, $business_id, $location_id);
             $query->where(function ($query) use ($location_id) {
                 $query->where('p.enable_stock', '!=', 1)
                             ->orWhere('vld.location_id', $location_id);
