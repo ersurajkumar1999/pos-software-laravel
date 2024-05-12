@@ -4,14 +4,16 @@
       <tr>
         <th>@lang('lang_v1.payment_method')</th>
         <th>@lang('sale.sale')</th>
+        <th>Account Payment</th>
         <th>@lang('lang_v1.expense')</th>
       </tr>
       <tr>
         <td>
           @lang('cash_register.cash_in_hand'):
         </td>
+        <td><span class="display_currency" data-currency_symbol="true">{{ $register_details->cash_in_hand }}</span> </td>
         <td>
-          <span class="display_currency" data-currency_symbol="true">{{ $register_details->cash_in_hand }}</span>
+          --
         </td>
         <td>--</td>
       </tr>
@@ -21,6 +23,9 @@
         </th>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash }}</span>
+        </td>
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['cash']}}</span>
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cash_expense }}</span>
@@ -34,6 +39,9 @@
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque }}</span>
         </td>
         <td>
+          <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['cheque']}}</span>
+        </td>
+        <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_cheque_expense }}</span>
         </td>
       </tr>
@@ -43,6 +51,10 @@
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card }}</span>
+        </td>
+        <!-- <td>$ {{$totalAmounts['card']}}</</td> -->
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['card']}}</span>
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_card_expense }}</span>
@@ -55,6 +67,10 @@
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer }}</span>
         </td>
+        <!-- <td>$ {{$totalAmounts['bank_transfer']}}</td> -->
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['bank_transfer']}}</span>
+        </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_bank_transfer_expense }}</span>
         </td>
@@ -65,6 +81,10 @@
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_advance }}</span>
+        </td>
+        <!-- <td>$ {{$totalAmounts['advance']}}</td> -->
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['advance']}}</span>
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_advance_expense }}</span>
@@ -77,6 +97,10 @@
           </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_1 }}</span>
+          </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_1']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_1']}}</span>
           </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_1_expense }}</span>
@@ -91,6 +115,10 @@
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_2 }}</span>
           </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_2']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_2']}}</span>
+          </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_2_expense }}</span>
           </td>
@@ -103,6 +131,10 @@
           </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_3 }}</span>
+          </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_3']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_3']}}</span>
           </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_3_expense }}</span>
@@ -117,6 +149,10 @@
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_4 }}</span>
           </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_4']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_4']}}</span>
+          </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_4_expense }}</span>
           </td>
@@ -129,6 +165,10 @@
           </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_5 }}</span>
+          </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_5']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_5']}}</span>
           </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_5_expense }}</span>
@@ -143,6 +183,10 @@
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_6 }}</span>
           </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_6']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_6']}}</span>
+          </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_6_expense }}</span>
           </td>
@@ -156,6 +200,10 @@
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_7 }}</span>
           </td>
+          <!-- <td>$ {{$totalAmounts['custom_pay_7']}}</td> -->
+          <td>
+            <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['custom_pay_7']}}</span>
+          </td>
           <td>
             <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_custom_pay_7_expense }}</span>
           </td>
@@ -167,6 +215,10 @@
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_other }}</span>
+        </td>
+        <!-- <td>$ {{$totalAmounts['other']}}</td> -->
+        <td>
+          <span class="display_currency" data-currency_symbol="true">{{$totalAmounts['other']}}</span>
         </td>
         <td>
           <span class="display_currency" data-currency_symbol="true">{{ $register_details->total_other_expense }}</span>
@@ -217,22 +269,21 @@
       <!--    </small>-->
       <!--  </td>-->
       <!--</tr>-->
-         @if($total_sell_return)
-        <tr class="success">
-          <th>
-            @lang('lang_v1.total_sell_return')
-          </th>
-          <td>
-            <b><span class="display_currency" data-currency_symbol="true">{{ $total_sell_return }}</span></b>
-          </td>
-      </tr>
-      @endif
+        
       <tr class="success">
         <th>
-          @lang('lang_v1.total_payment')
+          Total Cash Payment
         </th>
         <td>
           <b><span class="display_currency" data-currency_symbol="true">{{ $register_details->cash_in_hand + $register_details->total_cash - $register_details->total_cash_refund }}</span></b>
+        </td>
+      </tr>
+      <tr class="success">
+        <th>
+          Accounts Payment
+        </th>
+        <td>
+          <b><span class="display_currency" data-currency_symbol="true">$ {{$totalAmounts['totalAccountsPayment']}}</span></b>
         </td>
       </tr>
       <tr class="success">
@@ -251,6 +302,16 @@
           <b><span class="display_currency" data-currency_symbol="true">{{ $details['transaction_details']->total_sales }}</span></b>
         </td>
       </tr>
+      @if($total_sell_return)
+        <tr class="danger">
+          <th>
+            @lang('lang_v1.total_sell_return')
+          </th>
+          <td>
+            <b><span class="display_currency" data-currency_symbol="true">{{ $total_sell_return }}</span></b>
+          </td>
+      </tr>
+      @endif
       <tr class="danger">
         <th>
           @lang('report.total_expense'):

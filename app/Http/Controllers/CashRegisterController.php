@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\BusinessLocation;
 use App\CashRegister;
+use App\TransactionPayment;
 use App\Utils\CashRegisterUtil;
 use App\Utils\ModuleUtil;
 use Illuminate\Http\Request;
@@ -85,6 +86,8 @@ class CashRegisterController extends Controller
                         'location_id' => $request->input('location_id'),
                         'created_at' => \Carbon::now()->format('Y-m-d H:i:00')
                     ]);
+            // Update all rows in the TransactionPayment table
+            TransactionPayment::query()->update(['status' => 'close']);
             if (!empty($initial_amount)) {
                 $register->cash_register_transactions()->create([
                             'amount' => $initial_amount,
@@ -112,7 +115,6 @@ class CashRegisterController extends Controller
         if (!auth()->user()->can('view_cash_register')) {
             abort(403, 'Unauthorized action.');
         }
-
         $business_id = request()->session()->get('user.business_id');
 
         $register_details =  $this->cashRegisterUtil->getRegisterDetails($id);
@@ -123,8 +125,58 @@ class CashRegisterController extends Controller
 
         $payment_types = $this->cashRegisterUtil->payment_types(null, false, $business_id);
 
+        $transaction_payments = $this->cashRegisterUtil->getTransactionPayment($open_time, $close_time);
+        $sell_returns = $this->cashRegisterUtil->getRegisterTransactionDetailSellReturn($open_time, $close_time);
+        $total_sell_return = 0;
+        foreach($sell_returns as $sell_return) {
+            $total_sell_return += $sell_return->final_total;
+        }
+        // Define   an array containing all payment types
+        $paymentTypes = [
+            "cash",
+            "cheque",
+            "card",
+            "bank_transfer",
+            "advance",
+            "custom_pay_1",
+            "custom_pay_2",
+            "custom_pay_3",
+            "custom_pay_4",
+            "custom_pay_5",
+            "custom_pay_6",
+            "custom_pay_7",
+            "other",
+            "totalAccountsPayment"
+            // Add more payment types here if needed
+        ];
+
+        // Initialize an associative array to hold total amounts for each payment method
+        $totalAmounts = [];
+
+        // Set all payment types as keys with default value null
+        foreach ($paymentTypes as $paymentType) {
+            $totalAmounts[$paymentType] = 0.00;
+        }
+        // Iterate through each transaction payment
+        foreach ($transaction_payments as $transactionPayment) {
+            // Get the payment method for the transaction payment
+            $paymentMethod = $transactionPayment['method'];
+
+            // Get the amount for the transaction payment
+            $amount = $transactionPayment['amount'];
+
+            // If the payment method exists in the total amounts array, add the amount to it
+            if (isset($totalAmounts[$paymentMethod])) {
+                $totalAmounts[$paymentMethod] += $amount;
+            } else {
+                // If the payment method doesn't exist, initialize it with the amount
+                $totalAmounts[$paymentMethod] = $amount;
+            }
+            $totalAmounts['totalAccountsPayment'] += $amount;
+
+        }
         return view('cash_register.register_details')
-                    ->with(compact('register_details', 'details', 'payment_types', 'close_time'));
+                    ->with(compact('register_details', 'totalAmounts', 'total_sell_return','details', 'payment_types', 'close_time'));
     }
 
     /**
@@ -138,11 +190,9 @@ class CashRegisterController extends Controller
         if (!auth()->user()->can('view_cash_register')) {
             abort(403, 'Unauthorized action.');
         }
-
         $business_id = request()->session()->get('user.business_id');
-        
         $register_details =  $this->cashRegisterUtil->getRegisterDetails();
-
+        // dd($register_details);
         $user_id = auth()->user()->id;
         $open_time = $register_details['open_time'];
         $close_time = \Carbon::now()->toDateTimeString();
@@ -156,11 +206,60 @@ class CashRegisterController extends Controller
         foreach($sell_returns as $sell_return) {
             $total_sell_return += $sell_return->final_total;
         }
-
+        
         $payment_types = $this->cashRegisterUtil->payment_types($register_details->location_id, true, $business_id);
+
+        $transaction_payments = $this->cashRegisterUtil->getTransactionPayment($open_time, $close_time);
+        
+        // Define   an array containing all payment types
+        $paymentTypes = [
+            "cash",
+            "cheque",
+            "card",
+            "bank_transfer",
+            "advance",
+            "custom_pay_1",
+            "custom_pay_2",
+            "custom_pay_3",
+            "custom_pay_4",
+            "custom_pay_5",
+            "custom_pay_6",
+            "custom_pay_7",
+            "other",
+            "totalAccountsPayment"
+            // Add more payment types here if needed
+        ];
+
+        // Initialize an associative array to hold total amounts for each payment method
+        $totalAmounts = [];
+
+        // Set all payment types as keys with default value null
+        foreach ($paymentTypes as $paymentType) {
+            $totalAmounts[$paymentType] = 0.00;
+        }
+        // Iterate through each transaction payment
+        foreach ($transaction_payments as $transactionPayment) {
+            // Get the payment method for the transaction payment
+            $paymentMethod = $transactionPayment['method'];
+
+            // Get the amount for the transaction payment
+            $amount = $transactionPayment['amount'];
+
+            // If the payment method exists in the total amounts array, add the amount to it
+            if (isset($totalAmounts[$paymentMethod])) {
+                $totalAmounts[$paymentMethod] += $amount;
+            } else {
+                // If the payment method doesn't exist, initialize it with the amount
+                $totalAmounts[$paymentMethod] = $amount;
+            }
+            $totalAmounts['totalAccountsPayment'] += $amount;
+
+        }
+        // print_r($totalAmounts);
+        // $transaction_payments
         
         return view('cash_register.register_details')
-                ->with(compact('register_details','total_sell_return', 'details', 'payment_types', 'close_time'));
+                ->with(compact('register_details','totalAmounts', 'total_sell_return', 'details', 'payment_types', 'close_time'));
     }
 
     /**
@@ -194,8 +293,54 @@ class CashRegisterController extends Controller
         foreach($sell_returns as $sell_return) {
             $total_sell_return += $sell_return->final_total;
         }
+        $transaction_payments = $this->cashRegisterUtil->getTransactionPayment($open_time, $close_time);
+        
+        // Define   an array containing all payment types
+        $paymentTypes = [
+            "cash",
+            "cheque",
+            "card",
+            "bank_transfer",
+            "advance",
+            "custom_pay_1",
+            "custom_pay_2",
+            "custom_pay_3",
+            "custom_pay_4",
+            "custom_pay_5",
+            "custom_pay_6",
+            "custom_pay_7",
+            "other",
+            "totalAccountsPayment"
+            // Add more payment types here if needed
+        ];
+
+        // Initialize an associative array to hold total amounts for each payment method
+        $totalAmounts = [];
+
+        // Set all payment types as keys with default value null
+        foreach ($paymentTypes as $paymentType) {
+            $totalAmounts[$paymentType] = 0.00;
+        }
+        // Iterate through each transaction payment
+        foreach ($transaction_payments as $transactionPayment) {
+            // Get the payment method for the transaction payment
+            $paymentMethod = $transactionPayment['method'];
+
+            // Get the amount for the transaction payment
+            $amount = $transactionPayment['amount'];
+
+            // If the payment method exists in the total amounts array, add the amount to it
+            if (isset($totalAmounts[$paymentMethod])) {
+                $totalAmounts[$paymentMethod] += $amount;
+            } else {
+                // If the payment method doesn't exist, initialize it with the amount
+                $totalAmounts[$paymentMethod] = $amount;
+            }
+            $totalAmounts['totalAccountsPayment'] += $amount;
+
+        }
         return view('cash_register.close_register_modal')
-                    ->with(compact('register_details', 'total_sell_return', 'details', 'payment_types', 'pos_settings'));
+                    ->with(compact('register_details','totalAmounts', 'total_sell_return', 'details', 'payment_types', 'pos_settings'));
     }
 
     /**

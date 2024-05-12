@@ -84,6 +84,7 @@ class TransactionPaymentController extends Controller
                 $inputs['amount'] = $this->transactionUtil->num_uf($inputs['amount']);
                 $inputs['created_by'] = auth()->user()->id;
                 $inputs['payment_for'] = $transaction->contact_id;
+                $inputs['is_pos_payment'] = true;
 
                 if ($inputs['method'] == 'custom_pay_1') {
                     $inputs['transaction_no'] = $request->input('transaction_no_1');
@@ -103,7 +104,6 @@ class TransactionPaymentController extends Controller
                 } elseif (in_array($transaction->type, ['expense', 'expense_refund'])) {
                     $prefix_type = 'expense_payment';
                 }
-
                 DB::beginTransaction();
 
                 $ref_count = $this->transactionUtil->setAndGetReferenceCount($prefix_type);

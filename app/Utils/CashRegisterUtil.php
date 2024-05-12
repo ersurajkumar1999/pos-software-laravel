@@ -5,8 +5,9 @@ namespace App\Utils;
 use App\CashRegister;
 use App\CashRegisterTransaction;
 use App\Transaction;
-
+use App\TransactionPayment;
 use DB;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class CashRegisterUtil extends Util
 {
@@ -446,6 +447,53 @@ class CashRegisterUtil extends Util
 
         $sells->groupBy('transactions.id');
         return $sells->get();
+    }
+
+    public function getTransactionPayment($open_time, $close_time) {
+       
+        $start_date = date("Y-m-d",strtotime($open_time));
+        $end_date = date("Y-m-d",strtotime($close_time));
+        $business_id = request()->session()->get('user.business_id');
+        $query = TransactionPayment::leftjoin(
+            'transactions as T',
+            'transaction_payments.transaction_id',
+            '=',
+            'T.id'
+        )
+        ->leftjoin('accounts as A', 'transaction_payments.account_id', '=', 'A.id')
+        ->where('transaction_payments.business_id', $business_id)
+        ->whereNull('transaction_payments.parent_id')
+        ->where('transaction_payments.method', '!=', 'advance')
+        ->where('transaction_payments.status', '=', 'open')
+        ->where('transaction_payments.is_pos_payment', '=', true)
+        ->leftjoin('contacts as c', 'transaction_payments.payment_for', '=', 'c.id')
+        ->select([
+            'paid_on',
+            'payment_ref_no',
+            'T.ref_no',
+            'T.invoice_no',
+            'T.type',
+            'T.id as transaction_id',
+            'A.name as account_name',
+            'A.account_number',
+            'transaction_payments.id as payment_id',
+            'transaction_payments.account_id',
+            'c.name as contact_name',
+            'c.type as contact_type',
+            'transaction_payments.is_advance',
+            'transaction_payments.amount',
+            'transaction_payments.method'
+        ]);
+
+            // if (!empty($start_date) && !empty($end_date)) {
+                $query->whereBetween(FacadesDB::raw('date(paid_on)'), [$start_date , $end_date ]);
+            // }
+        // $query->where('status', 'open');
+        // $sells->whereBetween('transactions.transaction_date', [$open_time, $close_time]);
+
+        // $start_date = !empty(request()->input('start_date')) ? request()->input('start_date') : '';
+        // $end_date = !empty(request()->input('end_date')) ? request()->input('end_date') : '';
+        return $query->get();
     }
 
     /**

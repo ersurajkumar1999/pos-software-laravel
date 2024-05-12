@@ -1545,9 +1545,13 @@ class SellPosController extends Controller
         $product->secondary_unit_quantity = !isset($product->secondary_unit_quantity) ? 0 : $product->secondary_unit_quantity;
         $output['item_out_of_stock'] = false;
         $product->formatted_qty_available = $this->productUtil->num_f($product->qty_available, false, null, true);
-        if(!$product->formatted_qty_available){
-            $output['item_out_of_stock'] = true;
+        if($product->enable_stock){
+            if(!$product->formatted_qty_available){
+                $output['item_out_of_stock'] = true;
+            }
         }
+
+        
         $sub_units = $this->productUtil->getSubUnits($business_id, $product->unit_id, false, $product->product_id);
 
         //Get customer group and change the price accordingly
