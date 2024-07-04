@@ -18,7 +18,7 @@
         <th>{{ __('sale.discount') }}</th>
         <th>{{ __('sale.tax') }}</th>
         <th>{{ __('sale.price_inc_tax') }}</th>
-        <th>{{ __('sale.subtotal') }}</th>
+        <!-- <th>{{ __('sale.subtotal') }}</th> -->
     </tr>
     @foreach($sell->sell_lines as $sell_line)
         <tr>
@@ -116,13 +116,13 @@
                     <span class="display_currency" data-currency_symbol="true">{{ $sell_line->unit_price_inc_tax }}</span>
                 @endif
             </td>
-            <td>
+            <!-- <td>
                 @if(!empty($for_ledger))
                     @format_currency($sell_line->quantity * $sell_line->unit_price_inc_tax)
                 @else
                     <span class="display_currency" data-currency_symbol="true">{{ $sell_line->quantity * $sell_line->unit_price_inc_tax }}</span>
                 @endif
-            </td>
+            </td> -->
         </tr>
         @if(!empty($sell_line->modifiers))
         @foreach($sell_line->modifiers as $modifier)
